@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/hongfu22/trip_advisor#readme",
   "dependencies": {
+    "inquirer": "^9.2.8",
     "request": "^2.88.2"
   }
 }

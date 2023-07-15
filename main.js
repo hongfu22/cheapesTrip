@@ -24,7 +24,17 @@ request.post({
           queryPlace: { iata: 'TPE' }
         },
         anytime: true
-      }]
+      },
+      {
+        originPlace: {
+          queryPlace: { iata: 'TPE' }
+        },
+        destinationPlace: {
+          queryPlace: { iata: 'HND' }
+        },
+        anytime: true
+      }
+    ]
     }
   }
 }, (error, response, data) => {
@@ -32,6 +42,7 @@ request.post({
     console.log(response.statusCode)
     console.log(error)
   } else {
+    console.log(data.content.results);
     const quotesObject = data.content.results.quotes;
     const quotes = Object.keys(quotesObject).map(key => quotesObject[key].minPrice.amount);
     console.log(quotes)
