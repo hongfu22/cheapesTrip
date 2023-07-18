@@ -5,14 +5,18 @@ import Places from './places.js'
 const places = new Places();
 await places.initialize();
 
-  export async function selectContinent() {
+  export async function selectContinent(fromTo) {
     const continet = await places.exploitContinentNames();
+    const message = {
+      from: 'Which continent are you leaving from?',
+      to: 'Which continent would you like to visit?'
+    };
     return new Promise((resolve, reject) => {
       inquirer.prompt([
         {
           type: 'list',
           name: 'continent',
-          message: 'Which continent do you want to visit?',
+          message: message[fromTo],
           choices: continet
         }
       ])
@@ -26,14 +30,18 @@ await places.initialize();
     });
   }
 
-  export async function selectCountry(continent) {
+  export async function selectCountry(continent, fromTo) {
     const countryNames = await places.exploitCountryNames(continent);
+    const message = {
+      from: 'Which country are you leaving from?',
+      to: 'Which country are you thinking of visiting?'
+    };
     return new Promise((resolve, reject) => {
       inquirer.prompt([
         {
           type: 'list',
           name: 'country',
-          message: 'Which country do you want to visit?',
+          message: message[fromTo],
           choices: countryNames
         }
       ])
@@ -47,14 +55,18 @@ await places.initialize();
     });
   }
 
-  export async function selectCity(country) {
-    const cityNames = await places.exploitCityNames(country)
+  export async function selectCity(country, fromTo) {
+    const cityNames = await places.exploitCityNames(country);
+    const message = {
+      from: 'In which city are you planning to fly from?',
+      to: 'Which city are you planning to fly to?'
+    };
     return new Promise((resolve, reject) => {
       inquirer.prompt([
         {
           type: 'list',
           name: 'city',
-          message: 'Which city do you want to visit?',
+          message: message[fromTo],
           choices: cityNames
         }
       ])
@@ -75,7 +87,7 @@ await places.initialize();
         {
           type: 'list',
           name: 'airport',
-          message: 'Which airport do you want to visit?',
+          message: 'Which airport will you use?',
           choices: airportNames
         }
       ])
