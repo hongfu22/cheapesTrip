@@ -1,19 +1,12 @@
 import inquirer from "inquirer";
-import Places from "./places.js";
 import confirm from '@inquirer/confirm';
 import DatePrompt from "inquirer-date-prompt";
 
-const places = new Places();
-await places.initialize();
 inquirer.registerPrompt("date", DatePrompt);
 
 export default class Questions{
-  async selectContinent(fromTo) {
+  async selectContinent(continent,fromTo) {
     try {
-      const continent = await places.exploitContinentNames();
-      if (continent.length === 0) {
-        throw new Error("Invalid country name");
-      }
       const message = {
         from: "Which continent are you leaving from?",
         to: "Which continent would you like to visit?",
@@ -33,9 +26,8 @@ export default class Questions{
     }
   }
 
-  async selectCountry(continent, fromTo) {
+  async selectCountry(countryNames, fromTo) {
     try {
-      const countryNames = await places.exploitCountryNames(continent);
       if (countryNames.length === 0) {
         throw new Error("Invalid country name");
       }
@@ -58,9 +50,8 @@ export default class Questions{
     }
   }
 
-  async selectCity(country, fromTo) {
+  async selectCity(cityNames, fromTo) {
     try {
-      const cityNames = await places.exploitCityNames(country);
       if (cityNames.length === 0) {
         throw new Error("Invalid country name");
       }
@@ -83,9 +74,8 @@ export default class Questions{
     }
   }
 
-  async selectAirport(country) {
+  async selectAirport(airportNames) {
     try {
-      const airportNames = await places.exploitAirportNames(country);
       if (airportNames.length === 0) {
         throw new Error("Invalid country name");
       }

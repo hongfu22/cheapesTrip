@@ -3,7 +3,7 @@ const ENDPOINT =
   "https://partners.api.skyscanner.net/apiservices/v3/flights/indicative/search";
 const APIKEY = "sh428739766321522266746152871799";
 
-export async function fetchFee() {
+export async function fetchCheapestFare(departureAirport, arrivalAirport, departureDate, arrivalDate) {
   return new Promise((resolve, reject) => {
   request.post(
     {
@@ -13,7 +13,6 @@ export async function fetchFee() {
         "Content-Type": "application/json",
       },
       json: {
-        // JSONをPOSTする場合書く
         query: {
           market: "JP",
           locale: "ja-JP",
@@ -21,39 +20,21 @@ export async function fetchFee() {
           queryLegs: [
             {
               originPlace: {
-                queryPlace: { iata: "HND" },
+                queryPlace: { iata: departureAirport },
               },
               destinationPlace: {
-                queryPlace: { iata: "TPE" },
+                queryPlace: { iata: arrivalAirport },
               },
-              "dateRange": {
-                "startDate":{
-                    "month": 7,
-                    "year": 2023
-                },
-                "endDate":{
-                    "month": 8,
-                    "year": 2023
-                }
-              },
+              ...departureDate,
             },
             {
               originPlace: {
-                queryPlace: { iata: "TPE" },
+                queryPlace: { iata: arrivalAirport },
               },
               destinationPlace: {
-                queryPlace: { iata: "HND" },
+                queryPlace: { iata: departureAirport },
               },
-              "dateRange": {
-                "startDate":{
-                    "month": 7,
-                    "year": 2023
-                },
-                "endDate":{
-                    "month": 8,
-                    "year": 2023
-                }
-              },
+              ...arrivalDate,
             },
           ],
         },
@@ -61,6 +42,7 @@ export async function fetchFee() {
     },
     (error, response, data) => {
       if (error) {
+        console.log(response.statusCode);
         reject(error)
       } else {
         const quotesObject = data.content.results.quotes;

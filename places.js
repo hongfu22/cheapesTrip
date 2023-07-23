@@ -88,4 +88,20 @@ export default class Places {
       }
     });
   }
+
+  async fetchAirportInfo(airportName){
+    return new Promise((resolve, reject) => {
+      try {
+        this.airports = this.places.filter(
+          (d) => d.type === "PLACE_TYPE_AIRPORT"
+        );
+        this.airport = this.airports.filter(
+          (airport) => airport.name === airportName
+        );
+        resolve(this.airport)
+      } catch(error){
+        reject(error)
+      }
+    });
+  }
 }
