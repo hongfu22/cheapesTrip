@@ -1,5 +1,9 @@
-// import { selectContinent, selectCountry, selectAirport, selectCity } from "./questions.js";
-import * as questions from "./questions.js";
+import Questions from "./questions.js";
+import Places from "./places.js";
+import { fetchFee } from "./api.js";
+
+const questions = new Questions();
+const places = new Places();
 
 const departure_continent = await questions.selectContinent('from');
 console.log(departure_continent);
@@ -12,16 +16,15 @@ console.log(departure_airport);
 
 const departureDateFixed = await questions.askDateFixed();
 let departureDate = "";
-let departureDateStart = ""
-let departureDateEnd = ""
+let departureDateStart = "";
+let departureDateEnd = "";
+let fixedDateFormat = { month: "short", hour: undefined, minute: undefined };
+let dateFormat = { month: "short", day: undefined, hour: undefined, minute: undefined };
 if(departureDateFixed){
-  departureDate = new Date(await questions.selectDate('fixed') * 1000);
-  // console.log(departureDate.getDate());
+  departureDate = new Date(await questions.selectDate('fixed', fixedDateFormat) * 1000);
 } else {
-  departureDateStart = new Date(await questions.selectDate('from'));
-  departureDateEnd = new Date(await questions.selectDate('to'));
-  // console.log(departureDateStart);
-  // console.log(departureDateEnd);
+  departureDateStart = new Date(await questions.selectDate('from', dateFormat));
+  departureDateEnd = new Date(await questions.selectDate('to', dateFormat));
 }
 
 
@@ -35,15 +38,16 @@ const arrival_airport = await questions.selectAirport(arrival_city);
 console.log(arrival_airport);
 
 const returnDateFixed = await questions.askDateFixed();
-let returnDate = ""
-let returnDateStart = ""
-let returnDateEnd = ""
+let returnDate = "";
+let returnDateStart = "";
+let returnDateEnd = "";
+
 if(returnDateFixed){
-  returnDate = new Date(await questions.selectDate(returnDateFixed, 'fixed'));
+  returnDate = new Date(await questions.selectDate('fixed', fixedDateFormat));
   console.log(returnDate);
 } else {
-  returnDateStart = new Date(await questions.selectDate('from'));
-  returnDateEnd = new Date(await questions.selectDate('to'));
-  console.log(returnDateStart);
-  console.log(returnDateEnd);
+  returnDateStart = new Date(await questions.selectDate('from', dateFormat));
+  returnDateEnd = new Date(await questions.selectDate('to', dateFormat));
 }
+const fee = await fetchFee();
+console.log(fee);

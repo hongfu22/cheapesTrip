@@ -3,7 +3,8 @@ const ENDPOINT =
   "https://partners.api.skyscanner.net/apiservices/v3/flights/indicative/search";
 const APIKEY = "sh428739766321522266746152871799";
 
-export function fetchFee() {
+export async function fetchFee() {
+  return new Promise((resolve, reject) => {
   request.post(
     {
       uri: ENDPOINT,
@@ -28,11 +29,11 @@ export function fetchFee() {
               "dateRange": {
                 "startDate":{
                     "month": 7,
-                    "year": 2022
+                    "year": 2023
                 },
                 "endDate":{
                     "month": 8,
-                    "year": 2022
+                    "year": 2023
                 }
               },
             },
@@ -46,11 +47,11 @@ export function fetchFee() {
               "dateRange": {
                 "startDate":{
                     "month": 7,
-                    "year": 2022
+                    "year": 2023
                 },
                 "endDate":{
                     "month": 8,
-                    "year": 2022
+                    "year": 2023
                 }
               },
             },
@@ -60,17 +61,16 @@ export function fetchFee() {
     },
     (error, response, data) => {
       if (error) {
-        console.log(response.statusCode);
-        console.log(error);
+        reject(error)
       } else {
         const quotesObject = data.content.results.quotes;
         const quotes = Object.keys(quotesObject).map(
           (key) => quotesObject[key].minPrice.amount
         );
-        return quotes;
+        resolve(quotes);
       }
     }
-  );
+  )});
 }
 
 export async function fetchPlace() {
