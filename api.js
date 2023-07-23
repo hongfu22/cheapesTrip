@@ -1,14 +1,14 @@
 import request from "request";
-const endpoint =
+const ENDPOINT =
   "https://partners.api.skyscanner.net/apiservices/v3/flights/indicative/search";
-const apiKey = "sh428739766321522266746152871799";
+const APIKEY = "sh428739766321522266746152871799";
 
 export function fetchFee() {
   request.post(
     {
-      uri: endpoint,
+      uri: ENDPOINT,
       headers: {
-        "x-api-key": apiKey,
+        "x-api-key": APIKEY,
         "Content-Type": "application/json",
       },
       json: {
@@ -25,7 +25,16 @@ export function fetchFee() {
               destinationPlace: {
                 queryPlace: { iata: "TPE" },
               },
-              anytime: true,
+              "dateRange": {
+                "startDate":{
+                    "month": 7,
+                    "year": 2022
+                },
+                "endDate":{
+                    "month": 8,
+                    "year": 2022
+                }
+              },
             },
             {
               originPlace: {
@@ -34,7 +43,16 @@ export function fetchFee() {
               destinationPlace: {
                 queryPlace: { iata: "HND" },
               },
-              anytime: true,
+              "dateRange": {
+                "startDate":{
+                    "month": 7,
+                    "year": 2022
+                },
+                "endDate":{
+                    "month": 8,
+                    "year": 2022
+                }
+              },
             },
           ],
         },
@@ -61,7 +79,7 @@ export async function fetchPlace() {
       {
         uri: "https://partners.api.skyscanner.net/apiservices/v3/geo/hierarchy/flights/ja-JP",
         headers: {
-          "x-api-key": apiKey,
+          "x-api-key": APIKEY,
           "Content-Type": "application/json",
         },
       },

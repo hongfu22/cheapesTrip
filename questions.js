@@ -1,12 +1,15 @@
 import inquirer from "inquirer";
 import Places from "./places.js";
+import confirm from '@inquirer/confirm';
+import DatePrompt from "inquirer-date-prompt";
 
 const places = new Places();
 await places.initialize();
+inquirer.registerPrompt("date", DatePrompt);
 
 export async function selectContinent(fromTo) {
   try {
-    const continet = await places.exploitContinentNames();
+    const continent = await places.exploitContinentNames();
     if (continent.length === 0) {
       throw new Error("Invalid country name");
     }
@@ -19,7 +22,7 @@ export async function selectContinent(fromTo) {
         type: "list",
         name: "continent",
         message: message[fromTo],
-        choices: continet,
+        choices: continent,
       },
     ]);
     return answers.continent;
@@ -98,4 +101,28 @@ export async function selectAirport(country) {
     console.log("エラー:", error);
     throw error;
   }
+}
+
+export async function askDateFixed() {
+  const answer = await confirm({ message: "Do you have a fixed flight itinerary?" });
+  return answer;
+}
+
+export async function selectDate(fromTo) {
+  const message = {
+    fixed: "When?",
+    from: "From?",
+    to: "To?",
+  };
+  const { timestamp } = await inquirer.prompt({
+    type: "date",
+    name: "timestamp",
+    message: message[fromTo],
+    prefix: " 🌎 ",
+    filter: (d) => Math.floor(d.getTime() / 1000),
+    validate: (t) => t * 1000 > Date.now() + 86400000 || "God I hope not!",
+    format: { month: "short", hour: undefined, minute: undefined },
+    // clearable: true,
+  });
+  return timestamp;
 }
