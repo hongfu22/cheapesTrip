@@ -21,8 +21,7 @@ export default class Questions{
       ]);
       return answers.continent;
     } catch (error) {
-      console.log("エラー:", error);
-      throw error;
+      return error;
     }
   }
 
@@ -45,8 +44,7 @@ export default class Questions{
       ]);
       return answers.country;
     } catch (error) {
-      console.log("エラー:", error);
-      throw error;
+      return error;
     }
   }
 
@@ -69,15 +67,14 @@ export default class Questions{
       ]);
       return answers.city;
     } catch (error) {
-      console.log("エラー:", error);
-      throw error;
+      return error;
     }
   }
 
   async selectAirport(airportNames) {
     try {
       if (airportNames.length === 0) {
-        throw new Error("Invalid country name");
+        throw new Error("No airport in this city");
       }
       const answers = await inquirer.prompt([
         {
@@ -89,13 +86,17 @@ export default class Questions{
       ]);
       return answers.airport;
     } catch (error) {
-      console.log("エラー:", error);
-      throw error;
+      return error;
     }
   }
 
-  async askDateFixed() {
+  async isDateFixed() {
     const answer = await confirm({ message: "Do you have a fixed flight itinerary?" });
+    return answer;
+  }
+
+  async isReturn() {
+    const answer = await confirm({ message: "Do you also need returning flight info?" });
     return answer;
   }
 

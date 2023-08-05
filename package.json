@@ -17,6 +17,9 @@
   },
   "homepage": "https://github.com/hongfu22/trip_advisor#readme",
   "type": "module",
+  "parserOptions": {
+    "sourceType": "module"
+  },
   "dependencies": {
     "@inquirer/confirm": "^2.0.6",
     "inquirer": "^9.2.8",

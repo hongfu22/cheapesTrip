@@ -3,7 +3,7 @@ const ENDPOINT =
   "https://partners.api.skyscanner.net/apiservices/v3/flights/indicative/search";
 const APIKEY = "sh428739766321522266746152871799";
 
-export async function fetchCheapestFare(departureAirport, arrivalAirport, departureDate, arrivalDate) {
+export async function fetchCheapestFare(placesQuery) {
   return new Promise((resolve, reject) => {
   request.post(
     {
@@ -17,26 +17,7 @@ export async function fetchCheapestFare(departureAirport, arrivalAirport, depart
           market: "JP",
           locale: "ja-JP",
           currency: "JPY",
-          queryLegs: [
-            {
-              originPlace: {
-                queryPlace: { iata: departureAirport },
-              },
-              destinationPlace: {
-                queryPlace: { iata: arrivalAirport },
-              },
-              ...departureDate,
-            },
-            {
-              originPlace: {
-                queryPlace: { iata: arrivalAirport },
-              },
-              destinationPlace: {
-                queryPlace: { iata: departureAirport },
-              },
-              ...arrivalDate,
-            },
-          ],
+          queryLegs: placesQuery,
         },
       },
     },
@@ -47,9 +28,9 @@ export async function fetchCheapestFare(departureAirport, arrivalAirport, depart
       } else {
         const quotesObject = data.content.results.quotes;
         const quotes = Object.keys(quotesObject).map(
-          (key) => quotesObject[key].minPrice.amount
+          (key) => Number(quotesObject[key].minPrice.amount)
         );
-        resolve(quotes);
+        resolve(Math.min(...quotes));
       }
     }
   )});
