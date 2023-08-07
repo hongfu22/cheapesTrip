@@ -9,7 +9,7 @@ export default class Places {
     this.places = await fetchPlace();
   }
 
-  async exploitContinentNames() {
+  async extractContinentNames() {
     return new Promise((resolve, reject) => {
       try {
         this.continents = this.places.filter(
@@ -28,7 +28,7 @@ export default class Places {
     });
   }
 
-  async exploitCountryNames(continent) {
+  async extractCountryNames(continent) {
     return new Promise((resolve, reject) => {
       try {
         this.choosedContinent = this.continents.filter(
@@ -51,7 +51,7 @@ export default class Places {
     });
   }
 
-  async exploitCityNames(country) {
+  async extractCityNames(country) {
     return new Promise((resolve, reject) => {
       try {
         this.choosedCountry = this.countries.filter((d) => d.name === country);
@@ -68,7 +68,7 @@ export default class Places {
     });
   }
 
-  async exploitAirportNames(city) {
+  async extractAirportNames(city) {
     return new Promise((resolve, reject) => {
       try {
         this.choosedCity = this.cities.filter((d) => d.name === city);

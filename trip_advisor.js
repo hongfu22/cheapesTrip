@@ -2,140 +2,106 @@ import Questions from "./questions.js";
 import Places from "./places.js";
 import { fetchCheapestFare } from "./api.js";
 
-const questions = new Questions();
-const places = new Places();
-await places.initialize();
-
-const FIXEDDATEFORMAT = { month: "short", hour: undefined, minute: undefined };
-const UNFIXEDDATEFORMAT= { month: "short", day: undefined, hour: undefined, minute: undefined };
-const CONTINENT = await places.exploitContinentNames();
 
 class Trip {
-  async selectDepatureLocation(){
+  constructor(){
+    this.questions = new Questions();
+    this.places = new Places();
+    this.FIXEDDATEFORMAT = { month: "short", hour: undefined, minute: undefined };
+    this.UNFIXEDDATEFORMAT= { month: "short", day: undefined, hour: undefined, minute: undefined };
+  }
+
+  async initialize(){
+    await this.places.initialize();
+  }
+
+  async selectLocation(isDeparture){
     try{
-      this.departureContinent = await questions.selectContinent(CONTINENT, 'from');
-      const countryNames = await places.exploitCountryNames(this.departureContinent);
-      this.departureCountry = await questions.selectCountry(countryNames, 'from');
-      const cityNames = await places.exploitCityNames(this.departureCountry);
-      this.departureCity = await questions.selectCity(cityNames, 'from');
-      const airportNames = await places.exploitAirportNames(this.departureCity);
-      const departureAirport = await questions.selectAirport(airportNames);
-      this.departureAirport = await places.fetchAirportInfo(departureAirport);
-      this.DateFixed = await questions.isDateFixed();
-      if(this.DateFixed){
-        this.departureDate = new Date(await questions.selectDate('fixed', FIXEDDATEFORMAT) * 1000);
-      } else {
-        this.departureDateStart = new Date(await questions.selectDate('from', UNFIXEDDATEFORMAT) * 1000);
-        this.departureDateEnd = new Date(await questions.selectDate('to', UNFIXEDDATEFORMAT) * 1000);
-      }
-      this.isReturn = await questions.isReturn();
+      const continent = await this.places.extractContinentNames()
+      const selectedContinent = await this.questions.selectContinent(continent, isDeparture ? 'from' : 'to');
+      const countryNames = await this.places.extractCountryNames(selectedContinent);
+      const selectedCountry = await this.questions.selectCountry(countryNames, isDeparture ? 'from' : 'to');
+      const cityNames = await this.places.extractCityNames(selectedCountry);
+      const selectedCity = await this.questions.selectCity(cityNames, isDeparture ? 'from' : 'to');
+      const airportNames = await this.places.extractAirportNames(selectedCity);
+      const airport = await this.questions.selectAirport(airportNames);
+      return { selectedContinent, selectedCountry, selectedCity, airport: await this.places.fetchAirportInfo(airport) };
     } catch(error) {
       console.log(error);
-      console.log("もう一度選んでください")
-      return this.selectDepartureLocation()
+      console.log("もう一度選んでください");
+      return this.selectLocation(isDeparture);
     }
   }
 
-  async selectArrivalLocation(){
-    try{
-      this.arrivalContinent = await questions.selectContinent(CONTINENT, 'to');
-      const countryNames = await places.exploitCountryNames(this.arrivalContinent);
-      this.arrivalCountry = await questions.selectCountry(countryNames, 'to');
-      const cityNames = await places.exploitCityNames(this.arrivalCountry);
-      this.arrivalCity = await questions.selectCity(cityNames, 'to');
-      const airportNames = await places.exploitAirportNames(this.arrivalCity);
-      const arrivalAirport = await questions.selectAirport(airportNames);
-      this.arrivalAirport = await places.fetchAirportInfo(arrivalAirport);
-      if(this.isReturn){
-        if(this.DateFixed){
-          this.arrivalDate = new Date(await questions.selectDate('fixed', FIXEDDATEFORMAT) * 1000);
-        } else {
-          this.arrivalDateStart = new Date(await questions.selectDate('from', UNFIXEDDATEFORMAT) * 1000);
-          this.arrivalDateEnd = new Date(await questions.selectDate('to', UNFIXEDDATEFORMAT) * 1000);
+  async selectDateRange(){
+    if(this.isDateFixed){
+      const date = new Date(await this.questions.selectDate('fixed', this.FIXEDDATEFORMAT) * 1000);
+      return [date];
+    } else {
+      const startDate = new Date(await this.questions.selectDate('from', this.UNFIXEDDATEFORMAT) * 1000);
+      const endDate = new Date(await this.questions.selectDate('to', this.UNFIXEDDATEFORMAT) * 1000);
+      return [startDate, endDate];
+    }
+  }
+
+  async createDateQuery(date, isDateFixed){
+    if (isDateFixed) {
+      return {
+        fixedDate: {
+          year: date[0].getFullYear(),
+          month: date[0].getMonth() + 1,
+          day: date[0].getDate()
         }
-      }
-    } catch(error) {
-      console.log(error);
-      console.log("もう一度選んでください")
-      return this.selectArrivalLocation()
+      };
+    } else {
+      return {
+        dateRange: {
+          startDate: {
+            month: date[0].getMonth() + 1,
+            year: date[0].getFullYear()
+          },
+          endDate: {
+            month: date[1].getMonth() + 1,
+            year: date[1].getFullYear()
+          }
+        }
+      };
     }
   }
 
   async showCheapestFare(){
+    const departure = await this.selectLocation(true);
+    const arrival = await this.selectLocation(false);
     const placesQuery = []
-    const departurePlace = {
-      originPlace: {
-        queryPlace: { iata: this.departureAirport[0].iata },
-      },
-      destinationPlace: {
-        queryPlace: { iata: this.arrivalAirport[0].iata },
-      }
-    };
-    if(this.DateFixed){
-      this.departureDateRange = {
-        fixedDate: {
-          year: this.departureDate.getFullYear(),
-          month: this.departureDate.getMonth() + 1,
-          day: this.departureDate.getDate()
-        }
-      };
-    } else {
-      this.departureDateRange = {
-        dateRange: {
-          startDate: {
-            month: this.departureDateStart.getMonth() + 1,
-            year: this.departureDateStart.getFullYear()
-          },
-          endDate: {
-            month: this.departureDateEnd.getMonth() + 1,
-            year: this.departureDateEnd.getFullYear()
-          }
-        }
-      };
-    }
-    placesQuery.push({...departurePlace, ...this.departureDateRange})
-    if(this.isReturn){
-      const arrivalPlace = {
-        originPlace: {
-          queryPlace: { iata: this.arrivalAirport[0].iata },
-        },
-        destinationPlace: {
-          queryPlace: { iata: this.departureAirport[0].iata },
-        }
-      };
-      if(this.DateFixed){
-        this.arrivalDateRange = {
-          fixedDate: {
-            year: this.arrivalDate.getFullYear(),
-            month: this.arrivalDate.getMonth() + 1,
-            day: this.arrivalDate.getDate()
-          }
-        };
-      } else {
-        this.arrivalDateRange = {
-          dateRange: {
-            startDate: {
-              month: this.arrivalDateStart.getMonth() + 1,
-              year: this.arrivalDateStart.getFullYear(),
-            },
-            endDate: {
-              month: this.arrivalDateEnd.getMonth() + 1,
-              year: this.arrivalDateEnd.getFullYear(),
-            },
-          },
-        };
-      }
-      placesQuery.push({...arrivalPlace, ...this.arrivalDateRange})
+    this.isReturn = await this.questions.isReturn();
+    this.isDateFixed = await this.questions.isDateFixed();
+    console.log("行きの日程を教えてください");
+    const departureDate = await trip.selectDateRange();
+
+    const departureDateRange = await this.createDateQuery(departureDate, this.isDateFixed)
+    placesQuery.push({
+      originPlace: { queryPlace: { iata: departure.airport[0].iata } },
+      destinationPlace: { queryPlace: { iata: arrival.airport[0].iata } },
+      ...departureDateRange
+    });
+
+    if (this.isReturn) {
+      console.log("帰りの日程を教えてください");
+      const arrivalDate = await trip.selectDateRange();
+      const arrivalDateRange = await this.createDateQuery(arrivalDate, this.isDateFixed)
+      placesQuery.push({
+        originPlace: { queryPlace: { iata: arrival.airport[0].iata } },
+        destinationPlace: { queryPlace: { iata: departure.airport[0].iata } },
+        ...arrivalDateRange
+      });
     }
     const totalFare = await fetchCheapestFare(placesQuery);
-    console.log(totalFare)
     return totalFare;
   };
 }
 
 const trip = new Trip();
-await trip.selectDepatureLocation();
-await trip.selectArrivalLocation();
+await trip.initialize();
 const totalFare = await trip.showCheapestFare();
 
 console.log(`合計${totalFare}円になります。`)
