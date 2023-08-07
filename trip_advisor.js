@@ -24,8 +24,8 @@ class Trip {
       const cityNames = await this.places.extractCityNames(selectedCountry);
       const selectedCity = await this.questions.selectCity(cityNames, isDeparture ? 'from' : 'to');
       const airportNames = await this.places.extractAirportNames(selectedCity);
-      const airport = await this.questions.selectAirport(airportNames);
-      return { selectedContinent, selectedCountry, selectedCity, airport: await this.places.fetchAirportInfo(airport) };
+      const selectedAirport = await this.questions.selectAirport(airportNames);
+      return { selectedContinent, selectedCountry, selectedCity, airport: await this.places.fetchAirportInfo(selectedAirport) };
     } catch(error) {
       console.log(error);
       console.log("もう一度選んでください");
@@ -76,7 +76,7 @@ class Trip {
     this.isReturn = await this.questions.isReturn();
     this.isDateFixed = await this.questions.isDateFixed();
     console.log("行きの日程を教えてください");
-    const departureDate = await trip.selectDateRange();
+    const departureDate = await this.selectDateRange();
 
     const departureDateRange = await this.createDateQuery(departureDate, this.isDateFixed)
     placesQuery.push({
@@ -87,7 +87,7 @@ class Trip {
 
     if (this.isReturn) {
       console.log("帰りの日程を教えてください");
-      const arrivalDate = await trip.selectDateRange();
+      const arrivalDate = await this.selectDateRange();
       const arrivalDateRange = await this.createDateQuery(arrivalDate, this.isDateFixed)
       placesQuery.push({
         originPlace: { queryPlace: { iata: arrival.airport[0].iata } },
