@@ -34,13 +34,20 @@ class Trip {
   }
 
   async selectDateRange(){
-    if(this.isDateFixed){
-      const date = new Date(await this.questions.selectDate('fixed', this.FIXEDDATEFORMAT) * 1000);
-      return [date];
-    } else {
-      const startDate = new Date(await this.questions.selectDate('from', this.UNFIXEDDATEFORMAT) * 1000);
-      const endDate = new Date(await this.questions.selectDate('to', this.UNFIXEDDATEFORMAT) * 1000);
-      return [startDate, endDate];
+    try{
+      if(this.isDateFixed){
+        const date = new Date(await this.questions.selectDate('fixed', this.FIXEDDATEFORMAT) * 1000);
+        return [date];
+      } else {
+        const startDate = new Date(await this.questions.selectDate('from', this.UNFIXEDDATEFORMAT) * 1000);
+        const endDate = new Date(await this.questions.selectDate('to', this.UNFIXEDDATEFORMAT) * 1000);
+        if(startDate > endDate){ throw new Error("Invalid Date") }
+        return [startDate, endDate];
+      }
+    } catch(error) {
+      console.log(error);
+      console.log("選択した日付が無効です。もう一度日付を選んでください");
+      return this.selectDateRange();
     }
   }
 
@@ -70,33 +77,39 @@ class Trip {
   }
 
   async showCheapestFare(){
-    const departure = await this.selectLocation(true);
-    const arrival = await this.selectLocation(false);
-    const placesQuery = []
-    this.isReturn = await this.questions.isReturn();
-    this.isDateFixed = await this.questions.isDateFixed();
-    console.log("行きの日程を教えてください");
-    const departureDate = await this.selectDateRange();
-
-    const departureDateRange = await this.createDateQuery(departureDate, this.isDateFixed)
-    placesQuery.push({
-      originPlace: { queryPlace: { iata: departure.airport[0].iata } },
-      destinationPlace: { queryPlace: { iata: arrival.airport[0].iata } },
-      ...departureDateRange
-    });
-
-    if (this.isReturn) {
-      console.log("帰りの日程を教えてください");
-      const arrivalDate = await this.selectDateRange();
-      const arrivalDateRange = await this.createDateQuery(arrivalDate, this.isDateFixed)
+    try{
+      const departureLocation = await this.selectLocation(true);
+      const arrivalLocation = await this.selectLocation(false);
+      const placesQuery = []
+      this.isReturn = await this.questions.isReturn();
+      this.isDateFixed = await this.questions.isDateFixed();
+      console.log("行きの日程を教えてください");
+      const departureDate = await this.selectDateRange();
+      const departureDateRange = await this.createDateQuery(departureDate, this.isDateFixed)
       placesQuery.push({
-        originPlace: { queryPlace: { iata: arrival.airport[0].iata } },
-        destinationPlace: { queryPlace: { iata: departure.airport[0].iata } },
-        ...arrivalDateRange
+        originPlace: { queryPlace: { iata: departureLocation.airport[0].iata } },
+        destinationPlace: { queryPlace: { iata: arrivalLocation.airport[0].iata } },
+        ...departureDateRange
       });
+
+      if (this.isReturn) {
+        console.log("帰りの日程を教えてください");
+        const arrivalDate = await this.selectDateRange();
+        if(arrivalDate[0] < departureDate[0]){ throw new Error("Invalid Date") };
+        const arrivalDateRange = await this.createDateQuery(arrivalDate, this.isDateFixed)
+        placesQuery.push({
+          originPlace: { queryPlace: { iata: arrivalLocation.airport[0].iata } },
+          destinationPlace: { queryPlace: { iata: departureLocation.airport[0].iata } },
+          ...arrivalDateRange
+        });
+      }
+      const totalFare = await fetchCheapestFare(placesQuery);
+      return totalFare;
+    } catch(error) {
+      console.log(error);
+      console.log("チケットがありませんでした。もう一度やり直してください。")
+      return this.showCheapestFare();
     }
-    const totalFare = await fetchCheapestFare(placesQuery);
-    return totalFare;
   };
 }
 

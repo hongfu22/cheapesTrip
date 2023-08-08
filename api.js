@@ -1,6 +1,5 @@
 import request from "request";
-const ENDPOINT =
-  "https://partners.api.skyscanner.net/apiservices/v3/flights/indicative/search";
+const ENDPOINT = "https://partners.api.skyscanner.net/apiservices/v3/flights/indicative/search";
 const APIKEY = "sh428739766321522266746152871799";
 
 export async function fetchCheapestFare(placesQuery) {

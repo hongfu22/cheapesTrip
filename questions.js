@@ -6,28 +6,28 @@ inquirer.registerPrompt("date", DatePrompt);
 
 export default class Questions{
   async selectContinent(continent, fromTo) {
-      const message = {
-        from: "Which continent are you leaving from?",
-        to: "Which continent would you like to visit?",
-      };
-      const answers = await inquirer.prompt([
-        {
-          type: "list",
-          name: "continent",
-          message: message[fromTo],
-          choices: continent,
-        },
-      ]);
-      return new Promise((resolve, reject) => {
-        if (continent.length === 0) {
-          reject(new Error("No countries in this continent"));
-        } else {
-          resolve(answers.continent);
-        }
-      });
+    if(continent.length === 0){
+      throw new Error("No countries in this continent");
+    }
+    const message = {
+      from: "Which continent are you leaving from?",
+      to: "Which continent would you like to visit?",
+    };
+    const answers = await inquirer.prompt([
+      {
+        type: "list",
+        name: "continent",
+        message: message[fromTo],
+        choices: continent,
+      },
+    ]);
+    return answers.continent
   }
 
   async selectCountry(countryNames, fromTo) {
+    if(countryNames.length === 0){
+      throw new Error("No countries in this continent");
+    }
     const message = {
       from: "Which country are you leaving from?",
       to: "Which country are you thinking of visiting?",
@@ -40,16 +40,13 @@ export default class Questions{
         choices: countryNames,
       },
     ]);
-    return new Promise((resolve, reject) => {
-      if (countryNames.length === 0) {
-        reject(new Error("No countries in this continent"));
-      } else {
-        resolve(answers.country);
-      }
-    });
+    return answers.country;
   }
 
   async selectCity(cityNames, fromTo) {
+    if(cityNames.length === 0){
+      throw new Error("No cities in this country");
+    }
     const message = {
       from: "In which city are you planning to fly from?",
       to: "Which city are you planning to fly to?",
@@ -62,16 +59,13 @@ export default class Questions{
         choices: cityNames,
       },
     ]);
-    return new Promise((resolve, reject) => {
-      if (cityNames.length === 0) {
-        reject(new Error("No cities in this country"));
-      } else {
-        resolve(answers.city);
-      }
-    });
+    return answers.city;
   }
 
   async selectAirport(airportNames) {
+    if(airportNames.length === 0){
+      throw new Error("No airport in this city");
+    }
     const answers = await inquirer.prompt([
       {
         type: "list",
@@ -80,13 +74,7 @@ export default class Questions{
         choices: airportNames,
       },
     ]);
-    return new Promise((resolve, reject) => {
-      if (airportNames.length === 0) {
-        reject(new Error("No airport in this city"));
-      } else {
-        resolve(answers.airport);
-      }
-    });
+    return answers.airport
   }
 
   async isDateFixed() {
@@ -101,9 +89,9 @@ export default class Questions{
 
   async selectDate(fromTo, dateFormat) {
     const message = {
-      fixed: "When?",
-      from: "From?",
-      to: "To?",
+      fixed: "いつ?",
+      from: "出発月は?",
+      to: "現地出発月は?",
     };
     const { timestamp } = await inquirer.prompt({
       type: "date",
@@ -114,8 +102,6 @@ export default class Questions{
       validate: (time) => time * 1000 > Date.now() + 86400000 || "Invalid Date",
       format: dateFormat,
     });
-    return new Promise((resolve) => {
-      resolve(timestamp);
-    });
+    return timestamp
   }
 }
