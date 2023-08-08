@@ -15,65 +15,67 @@ export default class Places {
 
   async extractPlaceNames(place, parentEntityId){
     return new Promise((resolve, reject) => {
-      try {
-        const placesInParent = place.filter((place) => place.parentId === parentEntityId);
-        const placeNames = placesInParent.map(place => place.name);
+      const placesInParent = place.filter((place) => place.parentId === parentEntityId);
+      const placeNames = placesInParent.map(place => place.name);
+      if(!placesInParent) {
+        reject(new Error("Continent not found"));
+      } else {
         resolve(placeNames);
-      } catch (error) {
-        reject(error);
       }
     });
   }
 
   async extractContinentNames() {
-    return this.continents.map(continent => continent.name);
+    return new Promise((resolve) => {
+      resolve(this.continents.map(continent => continent.name));
+    });
   }
 
   async extractCountryNames(selectContinent) {
     return new Promise((resolve, reject) => {
-      try {
-        const choosedContinent = this.continents.find((continent) => continent.name === selectContinent)
-        this.countryNames = this.extractPlaceNames(this.countries, choosedContinent.entityId)
+      const choosedContinent = this.continents.find((continent) => continent.name === selectContinent)
+      this.countryNames = this.extractPlaceNames(this.countries, choosedContinent.entityId)
+      if(!choosedContinent){
+        reject(new Error("Continent not found"));
+      } else {
         resolve(this.countryNames);
-      } catch (error) {
-        reject(error);
       }
     });
   }
 
   async extractCityNames(selectCountry) {
     return new Promise((resolve, reject) => {
-      try {
-        const choosedCountry = this.countries.find((country) => country.name === selectCountry);
-        this.cityNames = this.extractPlaceNames(this.cities, choosedCountry.entityId);
+      const choosedCountry = this.countries.find((country) => country.name === selectCountry);
+      this.cityNames = this.extractPlaceNames(this.cities, choosedCountry.entityId);
+      if(!choosedCountry){
+        reject(new Error("Country not found"));
+      } else {
         resolve(this.cityNames);
-      } catch (error) {
-        reject(error);
       }
     });
   }
 
   async extractAirportNames(selectCity) {
     return new Promise((resolve, reject) => {
-      try {
-        const choosedCity = this.cities.find((city) => city.name === selectCity);
-        this.airportNames = this.extractPlaceNames(this.airports, choosedCity.entityId)
+      const choosedCity = this.cities.find((city) => city.name === selectCity);
+      this.airportNames = this.extractPlaceNames(this.airports, choosedCity.entityId)
+      if(!choosedCity){
+        reject(new Error("City not found"));
+      } else {
         resolve(this.airportNames);
-      } catch (error) {
-        reject(error);
       }
     });
   }
 
   async fetchAirportInfo(airportName){
     return new Promise((resolve, reject) => {
-      try {
-        this.airport = this.airports.filter(
-          (airport) => airport.name === airportName
-        );
-        resolve(this.airport)
-      } catch(error){
-        reject(error)
+      const airport = this.airports.filter(
+        (airport) => airport.name === airportName
+      );
+      if(!airport) {
+        reject(new Error("Airport not found"))
+      } else {
+        resolve(airport)
       }
     });
   }

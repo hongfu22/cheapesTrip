@@ -111,8 +111,8 @@ export default class Questions{
       name: "timestamp",
       message: message[fromTo],
       prefix: " 🌎 ",
-      filter: (d) => Math.floor(d.getTime() / 1000),
-      validate: (t) => t * 1000 > Date.now() + 86400000 || "God I hope not!",
+      filter: (date) => Math.floor(date.getTime() / 1000),
+      validate: (time) => time * 1000 > Date.now() + 86400000 || "God I hope not!",
       format: dateFormat,
     });
     return timestamp;

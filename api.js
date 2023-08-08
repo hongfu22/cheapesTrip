@@ -22,11 +22,12 @@ export async function fetchCheapestFare(placesQuery) {
       },
     },
     (error, response, data) => {
-      if (error) {
+      const quotesObject = data.content.results.quotes;
+      if (error || Object.entries(quotesObject).length === 0) {
         console.log(response.statusCode);
-        reject(error)
+        reject(new Error("Ticket not found"))
       } else {
-        const quotesObject = data.content.results.quotes;
+        console.log(quotesObject);
         const quotes = Object.keys(quotesObject).map(
           (key) => Number(quotesObject[key].minPrice.amount)
         );
