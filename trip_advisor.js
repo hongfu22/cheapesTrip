@@ -1,6 +1,6 @@
 import Questions from "./questions.js";
 import Places from "./places.js";
-import { fetchCheapestFare } from "./api.js";
+import { fetchCheapestFlight } from "./api.js";
 
 
 class Trip {
@@ -76,7 +76,7 @@ class Trip {
     }
   }
 
-  async showCheapestFare(){
+  async searchCheapestFlight(){
     try{
       const departureLocation = await this.selectLocation(true);
       const arrivalLocation = await this.selectLocation(false);
@@ -103,18 +103,29 @@ class Trip {
           ...arrivalDateRange
         });
       }
-      const totalFare = await fetchCheapestFare(placesQuery);
-      return totalFare;
+      const cheapestFlight = await fetchCheapestFlight(placesQuery);
+      return cheapestFlight;
     } catch(error) {
       console.log(error);
       console.log("チケットがありませんでした。もう一度やり直してください。")
-      return this.showCheapestFare();
+      return this.searchCheapestFlight();
     }
   };
+
+  async showCheapestFlight(cheapestFlight) {
+    console.log("--------行きの飛行機--------");
+    console.log(`航空会社:${cheapestFlight['departureFlightCarrier']}`);
+    console.log(`出発日:${cheapestFlight['departureDateTime']['year']}-${cheapestFlight['departureDateTime']['month']}-${cheapestFlight['departureDateTime']['day']}`)
+    console.log("--------帰りの飛行機--------")
+    console.log(`航空会社:${cheapestFlight['returnFlightCarrier']}`);
+    console.log(`出発日:${cheapestFlight['returnDateTime']['year']}-${cheapestFlight['returnDateTime']['month']}-${cheapestFlight['returnDateTime']['day']}`)
+    console.log("--------------------------")
+    console.log(cheapestFlight['isDirect'] ? '直行便' : 'トランジットあり')
+    console.log(`運賃は${cheapestFlight['amount']}円です。`)
+  }
 }
 
 const trip = new Trip();
 await trip.initialize();
-const totalFare = await trip.showCheapestFare();
-
-console.log(`合計${totalFare}円になります。`)
+const cheapestFlight = await trip.searchCheapestFlight();
+await trip.showCheapestFlight(cheapestFlight);

@@ -2,7 +2,7 @@ import request from "request";
 const ENDPOINT = "https://partners.api.skyscanner.net/apiservices/v3/flights/indicative/search";
 const APIKEY = "sh428739766321522266746152871799";
 
-export async function fetchCheapestFare(placesQuery) {
+export async function fetchCheapestFlight(placesQuery) {
   return new Promise((resolve, reject) => {
   request.post(
     {
@@ -21,15 +21,37 @@ export async function fetchCheapestFare(placesQuery) {
       },
     },
     (error, response, data) => {
-      const quotesObject = data.content.results.quotes;
-      if (error || Object.entries(quotesObject).length === 0) {
+      const fetchedFlights = data.content.results;
+      if (error || Object.entries(fetchedFlights.quotes).length === 0) {
         console.log(response.statusCode);
         reject(new Error("Ticket not found"))
       } else {
-        const quotes = Object.keys(quotesObject).map(
-          (key) => Number(quotesObject[key].minPrice.amount)
-        );
-        resolve(Math.min(...quotes));
+        let lowestPrice = 0;
+        let cheapestFlight = null;
+
+        for (const key in fetchedFlights.quotes) {
+          if (fetchedFlights.quotes.hasOwnProperty(key)) {
+            const minPrice = parseInt(fetchedFlights.quotes[key].minPrice.amount);
+            if (minPrice < lowestPrice || lowestPrice === 0) {
+              lowestPrice = minPrice;
+              cheapestFlight = fetchedFlights.quotes[key];
+              carrier = fetchedFlights.carriers[key];
+            }
+          }
+        }
+        const isDirect = cheapestFlight.isDirect;
+        const departureDateTime = cheapestFlight.outboundLeg.departureDateTime;
+        const returnDateTime = cheapestFlight.inboundLeg.departureDateTime;
+        const departureFlightCarrier = fetchedFlights.carriers[cheapestFlight.outboundLeg.marketingCarrierId].name;
+        const returnFlightCarrier = fetchedFlights.carriers[cheapestFlight.inboundLeg.marketingCarrierId].name;
+        resolve({
+          amount: lowestPrice,
+          isDirect: isDirect,
+          departureDateTime: departureDateTime,
+          returnDateTime: returnDateTime,
+          departureFlightCarrier: departureFlightCarrier,
+          returnFlightCarrier: returnFlightCarrier
+        });
       }
     }
   )});
