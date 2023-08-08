@@ -5,8 +5,7 @@ import DatePrompt from "inquirer-date-prompt";
 inquirer.registerPrompt("date", DatePrompt);
 
 export default class Questions{
-  async selectContinent(continent,fromTo) {
-    try {
+  async selectContinent(continent, fromTo) {
       const message = {
         from: "Which continent are you leaving from?",
         to: "Which continent would you like to visit?",
@@ -19,75 +18,75 @@ export default class Questions{
           choices: continent,
         },
       ]);
-      return answers.continent;
-    } catch (error) {
-      return error;
-    }
+      return new Promise((resolve, reject) => {
+        if (continent.length === 0) {
+          reject(new Error("No countries in this continent"));
+        } else {
+          resolve(answers.continent);
+        }
+      });
   }
 
   async selectCountry(countryNames, fromTo) {
-    try {
+    const message = {
+      from: "Which country are you leaving from?",
+      to: "Which country are you thinking of visiting?",
+    };
+    const answers = await inquirer.prompt([
+      {
+        type: "list",
+        name: "country",
+        message: message[fromTo],
+        choices: countryNames,
+      },
+    ]);
+    return new Promise((resolve, reject) => {
       if (countryNames.length === 0) {
-        throw new Error("Invalid country name");
+        reject(new Error("No countries in this continent"));
+      } else {
+        resolve(answers.country);
       }
-      const message = {
-        from: "Which country are you leaving from?",
-        to: "Which country are you thinking of visiting?",
-      };
-      const answers = await inquirer.prompt([
-        {
-          type: "list",
-          name: "country",
-          message: message[fromTo],
-          choices: countryNames,
-        },
-      ]);
-      return answers.country;
-    } catch (error) {
-      return error;
-    }
+    });
   }
 
   async selectCity(cityNames, fromTo) {
-    try {
+    const message = {
+      from: "In which city are you planning to fly from?",
+      to: "Which city are you planning to fly to?",
+    };
+    const answers = await inquirer.prompt([
+      {
+        type: "list",
+        name: "city",
+        message: message[fromTo],
+        choices: cityNames,
+      },
+    ]);
+    return new Promise((resolve, reject) => {
       if (cityNames.length === 0) {
-        throw new Error("Invalid country name");
+        reject(new Error("No cities in this country"));
+      } else {
+        resolve(answers.city);
       }
-      const message = {
-        from: "In which city are you planning to fly from?",
-        to: "Which city are you planning to fly to?",
-      };
-      const answers = await inquirer.prompt([
-        {
-          type: "list",
-          name: "city",
-          message: message[fromTo],
-          choices: cityNames,
-        },
-      ]);
-      return answers.city;
-    } catch (error) {
-      return error;
-    }
+    });
   }
 
   async selectAirport(airportNames) {
-    try {
+    const answers = await inquirer.prompt([
+      {
+        type: "list",
+        name: "airport",
+        message: "Which airport will you use?",
+        choices: airportNames,
+      },
+    ]);
+    return new Promise((resolve, reject) => {
       if (airportNames.length === 0) {
-        throw new Error("No airport in this city");
+        reject(new Error("No airport in this city"));
+      } else {
+        resolve(answers.airport);
       }
-      const answers = await inquirer.prompt([
-        {
-          type: "list",
-          name: "airport",
-          message: "Which airport will you use?",
-          choices: airportNames,
-        },
-      ]);
-      return answers.airport;
-    } catch (error) {
-      return error;
-    }
+    });
   }
 
   async isDateFixed() {
@@ -112,9 +111,11 @@ export default class Questions{
       message: message[fromTo],
       prefix: " 🌎 ",
       filter: (date) => Math.floor(date.getTime() / 1000),
-      validate: (time) => time * 1000 > Date.now() + 86400000 || "God I hope not!",
+      validate: (time) => time * 1000 > Date.now() + 86400000 || "Invalid Date",
       format: dateFormat,
     });
-    return timestamp;
+    return new Promise((resolve) => {
+      resolve(timestamp);
+    });
   }
 }

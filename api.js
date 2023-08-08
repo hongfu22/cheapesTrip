@@ -27,7 +27,6 @@ export async function fetchCheapestFare(placesQuery) {
         console.log(response.statusCode);
         reject(new Error("Ticket not found"))
       } else {
-        console.log(quotesObject);
         const quotes = Object.keys(quotesObject).map(
           (key) => Number(quotesObject[key].minPrice.amount)
         );
