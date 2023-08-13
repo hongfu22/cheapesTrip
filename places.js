@@ -1,13 +1,13 @@
 import { fetchPlace } from "./api.js";
+import { getMessage } from "./translation.js";
 
 export default class Places {
   constructor() {
     this.places = [];
   }
 
-  async initialize() {
-    this.places = await fetchPlace();
-    console.log(this.places);
+  async initialize(locale) {
+    this.places = await fetchPlace(locale);
     this.continents = this.places.filter(place => place.type === "PLACE_TYPE_CONTINENT");
     this.countries = this.places.filter(place => place.type === "PLACE_TYPE_COUNTRY");
     this.cities = this.places.filter(place => place.type === "PLACE_TYPE_CITY");
@@ -16,33 +16,33 @@ export default class Places {
 
   async extractPlaceNames(place, parentEntityId, type){
     const placesInParent = place.filter((place) => place.parentId === parentEntityId);
-    if(!placesInParent){ throw new Error(`${type} not found`); }
+    if(!placesInParent){ throw new Error(await getMessage(`no${type}`)); }
     const placeNames = placesInParent.map(place => place.name);
     return placeNames;
   }
 
   async extractContinentNames() {
-    if(!this.continents){ throw new Error("Continent not found"); }
+    if(!this.continents){ throw new Error(await getMessage("noContinent")); }
     return this.continents.map(continent => continent.name)
   }
 
   async extractCountryNames(selectContinent) {
     const choosedContinent = this.continents.find((continent) => continent.name === selectContinent)
-    if(!choosedContinent){ throw new Error("Continent not found"); }
+    if(!choosedContinent){ throw new Error(await getMessage("noContinent")); }
     this.countryNames = this.extractPlaceNames(this.countries, choosedContinent.entityId, "Country")
     return this.countryNames;
   }
 
   async extractCityNames(selectCountry) {
     const choosedCountry = this.countries.find((country) => country.name === selectCountry);
-    if(!choosedCountry){ throw new Error("Country not found"); }
+    if(!choosedCountry){ throw new Error(await getMessage("noCountry")); }
     this.cityNames = this.extractPlaceNames(this.cities, choosedCountry.entityId, "City");
     return this.cityNames;
   }
 
   async extractAirportNames(selectCity) {
     const choosedCity = this.cities.find((city) => city.name === selectCity);
-    if(!choosedCity){ throw new Error("City not found"); }
+    if(!choosedCity){ throw new Error(await getMessage("noCity")); }
     this.airportNames = this.extractPlaceNames(this.airports, choosedCity.entityId, "Airport");
     return this.airportNames;
   }

@@ -1,8 +1,9 @@
 import request from "request";
+import { getMessage } from "./translation.js";
 const ENDPOINT = "https://partners.api.skyscanner.net/apiservices/v3/flights/indicative/search";
 const APIKEY = "sh428739766321522266746152871799";
 
-export async function fetchCheapestFlight(placesQuery) {
+export async function fetchCheapestFlight(placesQuery, language, locale, currency) {
   return new Promise((resolve, reject) => {
   request.post(
     {
@@ -13,9 +14,9 @@ export async function fetchCheapestFlight(placesQuery) {
       },
       json: {
         query: {
-          market: "JP",
-          locale: "ja-JP",
-          currency: "JPY",
+          market: language,
+          locale: locale,
+          currency: currency,
           queryLegs: placesQuery,
         },
       },
@@ -24,18 +25,16 @@ export async function fetchCheapestFlight(placesQuery) {
       const fetchedFlights = data.content.results;
       if (error || Object.entries(fetchedFlights.quotes).length === 0) {
         console.log(response.statusCode);
-        reject(new Error("Ticket not found"))
+        reject(new Error(getMessage("noTicket")))
       } else {
         let lowestPrice = 0;
         let cheapestFlight = null;
-
         for (const key in fetchedFlights.quotes) {
           if (fetchedFlights.quotes.hasOwnProperty(key)) {
             const minPrice = parseInt(fetchedFlights.quotes[key].minPrice.amount);
             if (minPrice < lowestPrice || lowestPrice === 0) {
               lowestPrice = minPrice;
               cheapestFlight = fetchedFlights.quotes[key];
-              carrier = fetchedFlights.carriers[key];
             }
           }
         }
@@ -57,11 +56,11 @@ export async function fetchCheapestFlight(placesQuery) {
   )});
 }
 
-export async function fetchPlace() {
+export async function fetchPlace(locale) {
   return new Promise((resolve, reject) => {
     request.get(
       {
-        uri: "https://partners.api.skyscanner.net/apiservices/v3/geo/hierarchy/flights/ja-JP",
+        uri: `https://partners.api.skyscanner.net/apiservices/v3/geo/hierarchy/flights/${locale}`,
         headers: {
           "x-api-key": APIKEY,
           "Content-Type": "application/json",

@@ -1,17 +1,18 @@
 import inquirer from "inquirer";
 import confirm from '@inquirer/confirm';
 import DatePrompt from "inquirer-date-prompt";
+import { getMessage } from './translation.js';
 
 inquirer.registerPrompt("date", DatePrompt);
 
 export default class Questions{
   async selectContinent(continent, fromTo) {
     if(continent.length === 0){
-      throw new Error("No countries in this continent");
+      throw new Error(await getMessage("noContinent"));
     }
     const message = {
-      from: "Which continent are you leaving from?",
-      to: "Which continent would you like to visit?",
+      from: await getMessage("fromContinent"),
+      to: await getMessage("toContinent"),
     };
     const answers = await inquirer.prompt([
       {
@@ -26,11 +27,11 @@ export default class Questions{
 
   async selectCountry(countryNames, fromTo) {
     if(countryNames.length === 0){
-      throw new Error("No countries in this continent");
+      throw new Error(await getMessage("noCountry"));
     }
     const message = {
-      from: "Which country are you leaving from?",
-      to: "Which country are you thinking of visiting?",
+      from: await getMessage("fromCountry"),
+      to: await getMessage("toCountry"),
     };
     const answers = await inquirer.prompt([
       {
@@ -45,11 +46,11 @@ export default class Questions{
 
   async selectCity(cityNames, fromTo) {
     if(cityNames.length === 0){
-      throw new Error("No cities in this country");
+      throw new Error(await getMessage("noCity"));
     }
     const message = {
-      from: "In which city are you planning to fly from?",
-      to: "Which city are you planning to fly to?",
+      from: await getMessage("fromCity"),
+      to: await getMessage("toCity"),
     };
     const answers = await inquirer.prompt([
       {
@@ -64,34 +65,92 @@ export default class Questions{
 
   async selectAirport(airportNames) {
     if(airportNames.length === 0){
-      throw new Error("No airport in this city");
+      throw new Error(await getMessage("noAirport"));
     }
     const answers = await inquirer.prompt([
       {
         type: "list",
         name: "airport",
-        message: "Which airport will you use?",
+        message: await getMessage("airport"),
         choices: airportNames,
       },
     ]);
     return answers.airport
   }
 
+  async selectLanguage() {
+    const languages = {
+      "Japanese": "jp",
+      "English-US": "us",
+      "Chinese-TW": "tw"
+    }
+    
+
+    const answer = await inquirer.prompt([
+      {
+        type: "list",
+        name: "language",
+        message: "言語を選んでください/Choose your language/選您的語言",
+        choices: Object.keys(languages),
+      },
+    ]);
+
+    return languages[answer.language];
+  }
+
+  async selectLocale() {
+    const locales = {
+      "Japan": "ja-JP",
+      "United States": "en-US",
+      "Taiwan": "zh-TW"
+    }
+
+    const answer = await inquirer.prompt([
+      {
+        type: "list",
+        name: "locale",
+        message: "ご利用地域を教えてください/Tell us your area of use./選您使用的地理區域",
+        choices: Object.keys(locales),
+      },
+    ]);
+
+    return locales[answer.locale];
+  }
+
+  async selectCurrency() {
+    const currencies = {
+      "Japanese Yen(JPY)": "JPY",
+      "US dollar": "USD",
+      "Taiwan Dollar(TWD)": "TWD"
+    }
+
+    const answer = await inquirer.prompt([
+      {
+        type: "list",
+        name: "currency",
+        message: "ご利用の通貨は？/What currency do you use?/您使用什麼貨幣?",
+        choices: Object.keys(currencies),
+      },
+    ]);
+
+    return currencies[answer.currency];
+  }
+
   async isDateFixed() {
-    const answer = await confirm({ message: "Do you have a fixed flight itinerary?" });
+    const answer = await confirm({ message: getMessage("fixedItinerary") });
     return answer;
   }
 
   async isReturn() {
-    const answer = await confirm({ message: "Do you also need returning flight info?" });
+    const answer = await confirm({ message: await getMessage("roundTrip") });
     return answer;
   }
 
   async selectDate(fromTo, dateFormat) {
     const message = {
-      fixed: "いつ?",
-      from: "出発月は?",
-      to: "現地出発月は?",
+      fixed: await getMessage("fixed"),
+      from: await getMessage("from"),
+      to: await getMessage("to"),
     };
     const { timestamp } = await inquirer.prompt({
       type: "date",
@@ -99,7 +158,7 @@ export default class Questions{
       message: message[fromTo],
       prefix: " 🌎 ",
       filter: (date) => Math.floor(date.getTime() / 1000),
-      validate: (time) => time * 1000 > Date.now() + 86400000 || "Invalid Date",
+      validate: (time) => time * 1000 > Date.now() + 86400000 || getMessage("invalidDate"),
       format: dateFormat,
     });
     return timestamp
