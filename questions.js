@@ -136,6 +136,11 @@ export default class Questions{
     return currencies[answer.currency];
   }
 
+  async isMonth() {
+    const answer = await confirm({ message: getMessage("fixedMonth") });
+    return answer;
+  }
+
   async isDateFixed() {
     const answer = await confirm({ message: getMessage("fixedItinerary") });
     return answer;
@@ -146,7 +151,7 @@ export default class Questions{
     return answer;
   }
 
-  async selectDate(fromTo, dateFormat) {
+  async selectDate(fromTo, dateFormat, locale) {
     const message = {
       fixed: await getMessage("fixed"),
       from: await getMessage("from"),
@@ -158,7 +163,18 @@ export default class Questions{
       message: message[fromTo],
       prefix: " 🌎 ",
       filter: (date) => Math.floor(date.getTime() / 1000),
-      validate: (time) => time * 1000 > Date.now() + 86400000 || getMessage("invalidDate"),
+      validate: (time) => {
+        const selectedDate = new Date(time * 1000);
+        const currentDate = new Date();
+        selectedDate.setUTCHours(0, 0, 0, 0);
+        currentDate.setUTCHours(0, 0, 0, 0);
+        if (selectedDate >= currentDate) {
+          return true;  // 有効な日付
+        } else {
+          return getMessage("invalidDate");  // 無効な日付のエラーメッセージ
+        }
+      },
+      locale: locale,
       format: dateFormat,
     });
     return timestamp

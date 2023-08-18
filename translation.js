@@ -26,6 +26,7 @@ export async function initializeI18n(language){
           "fixed": "いつ?",
           "from": "出発月は?",
           "to": "現地出発月は?",
+          "fixedMonth": "出発帰還月は決まっていますか？",
           "fixedItinerary": "日付は決まっていますか?",
           "roundTrip": "往復旅行ですか？?",
           // Tripクラス
@@ -40,7 +41,7 @@ export async function initializeI18n(language){
           "returnDate": "帰還日",
           "returnFlight": "--------帰りの飛行機--------",
           "direct": "直行便",
-          "transit": "乗り継ぎあり",
+          "connectingFlight": "乗り継ぎあり",
           "ticketPrice": "チケット代"
         },
       },
@@ -64,6 +65,7 @@ export async function initializeI18n(language){
           "fixed": "When?",
           "from": "When are you going to get bound flight?",
           "to": "When are you going to get return flight?",
+          "fixedMonth": "Have you already decided what month you will go/return?",
           "fixedItinerary": "Do you have a fixed flight itinerary?",
           "roundTrip": "Round-trip?",
           // Trip
@@ -102,6 +104,7 @@ export async function initializeI18n(language){
           "fixed": "什麼時候?",
           "from": "什麼時候搭飛機去?",
           "to": "什麼時候搭飛機回來?",
+          "fixedMonth": "您已經決定哪個月出發/返回?",
           "fixedItinerary": "已經確定旅行的行程嗎?",
           "roundTrip": "往返旅程?",
           // Trip

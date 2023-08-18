@@ -41,11 +41,11 @@ class Trip {
   async selectDateRange(){
     try{
       if(this.isDateFixed){
-        const date = new Date(await this.questions.selectDate('fixed', this.FIXEDDATEFORMAT) * 1000);
+        const date = new Date(await this.questions.selectDate('fixed', this.FIXEDDATEFORMAT, this.locale) * 1000);
         return [date];
       } else {
-        const startDate = new Date(await this.questions.selectDate('from', this.UNFIXEDDATEFORMAT) * 1000);
-        const endDate = new Date(await this.questions.selectDate('to', this.UNFIXEDDATEFORMAT) * 1000);
+        const startDate = new Date(await this.questions.selectDate('from', this.UNFIXEDDATEFORMAT, this.locale) * 1000);
+        const endDate = new Date(await this.questions.selectDate('to', this.UNFIXEDDATEFORMAT, this.locale) * 1000);
         if(startDate > endDate){ throw new Error("Invalid Date") }
         return [startDate, endDate];
       }
@@ -56,8 +56,8 @@ class Trip {
     }
   }
 
-  async createDateQuery(date, isDateFixed){
-    if (isDateFixed) {
+  async createDateQuery(date, isMonth, isDateFixed){
+    if (isMonth && isDateFixed) {
       return {
         fixedDate: {
           year: date[0].getFullYear(),
@@ -65,7 +65,7 @@ class Trip {
           day: date[0].getDate()
         }
       };
-    } else {
+    } else if(isMonth) {
       return {
         dateRange: {
           startDate: {
@@ -87,10 +87,15 @@ class Trip {
       const arrivalLocation = await this.selectLocation(false);
       const placesQuery = []
       this.isReturn = await this.questions.isReturn();
-      this.isDateFixed = await this.questions.isDateFixed();
-      console.log(await getMessage("tellDepartureDate"));
-      const departureDate = await this.selectDateRange();
-      const departureDateRange = await this.createDateQuery(departureDate, this.isDateFixed)
+      this.isMonth = await this.questions.isMonth();
+      let departureDate = ""
+      let departureDateRange = { anytime: true };
+      if(this.isMonth){
+        this.isDateFixed = await this.questions.isDateFixed();
+        console.log(await getMessage("tellDepartureDate"));
+        departureDate = await this.selectDateRange();
+        departureDateRange = await this.createDateQuery(departureDate, this.isMonth,this.isDateFixed);
+      };
       placesQuery.push({
         originPlace: { queryPlace: { iata: departureLocation.airport[0].iata } },
         destinationPlace: { queryPlace: { iata: arrivalLocation.airport[0].iata } },
@@ -98,10 +103,13 @@ class Trip {
       });
 
       if (this.isReturn) {
-        console.log(await getMessage("tellReturnDate"));
-        const arrivalDate = await this.selectDateRange();
+        let arrivalDate = ""
+        if(this.isMonth){
+          console.log(await getMessage("tellReturnDate"));
+          arrivalDate = await this.selectDateRange();
+        }
         if(arrivalDate[0] < departureDate[0]){ throw new Error("Invalid Date") };
-        const arrivalDateRange = await this.createDateQuery(arrivalDate, this.isDateFixed)
+        const arrivalDateRange = await this.createDateQuery(arrivalDate, this.isMonth, this.isDateFixed)
         placesQuery.push({
           originPlace: { queryPlace: { iata: arrivalLocation.airport[0].iata } },
           destinationPlace: { queryPlace: { iata: departureLocation.airport[0].iata } },
