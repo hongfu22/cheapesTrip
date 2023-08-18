@@ -3,7 +3,7 @@ import { getMessage } from "./translation.js";
 const ENDPOINT = "https://partners.api.skyscanner.net/apiservices/v3/flights/indicative/search";
 const APIKEY = "sh428739766321522266746152871799";
 
-export async function fetchCheapestFlight(placesQuery, language, locale, currency) {
+export async function fetchCheapestFlight(placesQuery, market, locale, currency) {
   return new Promise((resolve, reject) => {
   request.post(
     {
@@ -14,7 +14,7 @@ export async function fetchCheapestFlight(placesQuery, language, locale, currenc
       },
       json: {
         query: {
-          market: language,
+          market: market,
           locale: locale,
           currency: currency,
           queryLegs: placesQuery,
@@ -81,6 +81,32 @@ export async function fetchPlace(locale) {
             (key) => parsed_data[key]
           );
           resolve(places);
+        }
+      }
+    );
+  });
+}
+
+export async function fetchMarket(locale) {
+  return new Promise((resolve, reject) => {
+    request.get(
+      {
+        uri: `https://partners.api.skyscanner.net/apiservices/v3/culture/markets/${locale}`,
+        headers: {
+          "x-api-key": APIKEY,
+          "Content-Type": "application/json",
+        },
+      },
+      (error, response, data) => {
+        if (error) {
+          console.log(response.statusCode);
+          reject(error);
+        } else {
+          const parsed_data = JSON.parse(data).markets;
+          const markets = Object.keys(parsed_data).map(
+            (key) => parsed_data[key]
+          );
+          resolve(markets);
         }
       }
     );

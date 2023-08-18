@@ -84,6 +84,12 @@ export default class Questions{
       "English-US": "us",
       "Chinese-TW": "tw"
     }
+
+    const locales = {
+      "jp": "ja-JP",
+      "us": "en-US",
+      "tw": "zh-TW"
+    }
     
 
     const answer = await inquirer.prompt([
@@ -95,27 +101,29 @@ export default class Questions{
       },
     ]);
 
-    return languages[answer.language];
+    const language = languages[answer.language];
+    const locale = locales[language];
+    return [language, locale];
   }
 
-  async selectLocale() {
-    const locales = {
-      "Japan": "ja-JP",
-      "United States": "en-US",
-      "Taiwan": "zh-TW"
-    }
+  // async selectLocale() {
+  //   const locales = {
+  //     "Japan": "ja-JP",
+  //     "United States": "en-US",
+  //     "Taiwan": "zh-TW"
+  //   }
 
-    const answer = await inquirer.prompt([
-      {
-        type: "list",
-        name: "locale",
-        message: "ご利用地域を教えてください/Tell us your area of use./選您使用的地理區域",
-        choices: Object.keys(locales),
-      },
-    ]);
+  //   const answer = await inquirer.prompt([
+  //     {
+  //       type: "list",
+  //       name: "locale",
+  //       message: "ご利用地域を教えてください/Tell us your area of use./選您使用的地理區域",
+  //       choices: Object.keys(locales),
+  //     },
+  //   ]);
 
-    return locales[answer.locale];
-  }
+  //   return locales[answer.locale];
+  // }
 
   async selectCurrency() {
     const currencies = {
@@ -142,7 +150,7 @@ export default class Questions{
   }
 
   async isDateFixed() {
-    const answer = await confirm({ message: getMessage("fixedItinerary") });
+    const answer = await confirm({ message: getMessage("fixedDay") });
     return answer;
   }
 

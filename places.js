@@ -1,4 +1,4 @@
-import { fetchPlace } from "./api.js";
+import { fetchPlace, fetchMarket } from "./api.js";
 import { getMessage } from "./translation.js";
 
 export default class Places {
@@ -8,6 +8,7 @@ export default class Places {
 
   async initialize(locale) {
     this.places = await fetchPlace(locale);
+    this.markets = await fetchMarket(locale);
     this.continents = this.places.filter(place => place.type === "PLACE_TYPE_CONTINENT");
     this.countries = this.places.filter(place => place.type === "PLACE_TYPE_COUNTRY");
     this.cities = this.places.filter(place => place.type === "PLACE_TYPE_CITY");
@@ -26,25 +27,30 @@ export default class Places {
     return this.continents.map(continent => continent.name)
   }
 
-  async extractCountryNames(selectContinent) {
-    const choosedContinent = this.continents.find((continent) => continent.name === selectContinent)
+  async extractCountryNames(selectedContinent) {
+    const choosedContinent = this.continents.find((continent) => continent.name === selectedContinent)
     if(!choosedContinent){ throw new Error(await getMessage("noContinent")); }
     this.countryNames = this.extractPlaceNames(this.countries, choosedContinent.entityId, "Country")
     return this.countryNames;
   }
 
-  async extractCityNames(selectCountry) {
-    const choosedCountry = this.countries.find((country) => country.name === selectCountry);
+  async extractCityNames(selectedCountry) {
+    const choosedCountry = this.countries.find((country) => country.name === selectedCountry);
     if(!choosedCountry){ throw new Error(await getMessage("noCountry")); }
     this.cityNames = this.extractPlaceNames(this.cities, choosedCountry.entityId, "City");
     return this.cityNames;
   }
 
-  async extractAirportNames(selectCity) {
-    const choosedCity = this.cities.find((city) => city.name === selectCity);
+  async extractAirportNames(selectedCity) {
+    const choosedCity = this.cities.find((city) => city.name === selectedCity);
     if(!choosedCity){ throw new Error(await getMessage("noCity")); }
     this.airportNames = this.extractPlaceNames(this.airports, choosedCity.entityId, "Airport");
     return this.airportNames;
+  }
+
+  async extractMarketName(countryName) {
+    const marketName = this.markets.find((market) => market.name === countryName);
+    return marketName.code;
   }
 
   async fetchAirportInfo(airportName){

@@ -13,8 +13,7 @@ class Trip {
   }
 
   async initialize(){
-    this.language = await this.questions.selectLanguage();
-    this.locale = await this.questions.selectLocale();
+    [this.language, this.locale] = await this.questions.selectLanguage();
     this.currency = await this.questions.selectCurrency();
     await this.places.initialize(this.locale);
     await initializeI18n(this.language);
@@ -81,10 +80,11 @@ class Trip {
     }
   }
 
-  async searchCheapestFlight(language, locale, currency){
+  async searchCheapestFlight(locale, currency){
     try{
       const departureLocation = await this.selectLocation(true);
       const arrivalLocation = await this.selectLocation(false);
+      const market = await this.places.extractMarketName(departureLocation.selectedCountry);
       const placesQuery = []
       this.isReturn = await this.questions.isReturn();
       this.isMonth = await this.questions.isMonth();
@@ -116,12 +116,12 @@ class Trip {
           ...arrivalDateRange
         });
       }
-      const cheapestFlight = await fetchCheapestFlight(placesQuery, language, locale, currency);
+      const cheapestFlight = await fetchCheapestFlight(placesQuery, market, locale, currency);
       return cheapestFlight;
     } catch(error) {
       console.log(error);
       console.log(await getMessage("noTickets"))
-      return this.searchCheapestFlight();
+      return this.searchCheapestFlight(locale, currency);
     }
   };
 
@@ -134,11 +134,11 @@ class Trip {
     console.log(`${await getMessage("returnDate")}:${cheapestFlight['returnDateTime']['year']}-${cheapestFlight['returnDateTime']['month']}-${cheapestFlight['returnDateTime']['day']}`)
     console.log("--------------------------")
     console.log(cheapestFlight['isDirect'] ? await getMessage("direct") : await getMessage("connectingFlight"))
-    console.log(`${await getMessage("ticketPrice")}:${cheapestFlight['amount']}円`)
+    console.log(`${await getMessage("ticketPrice")}:${cheapestFlight['amount']} ${this.currency}`)
   }
 }
 
 const trip = new Trip();
 await trip.initialize();
-const cheapestFlight = await trip.searchCheapestFlight(trip.language.toUpperCase(), trip.locale, trip.currency);
+const cheapestFlight = await trip.searchCheapestFlight(trip.locale, trip.currency);
 await trip.showCheapestFlight(cheapestFlight);
