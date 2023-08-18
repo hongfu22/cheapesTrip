@@ -1,13 +1,13 @@
 import inquirer from "inquirer";
-import confirm from '@inquirer/confirm';
+import confirm from "@inquirer/confirm";
 import DatePrompt from "inquirer-date-prompt";
-import { getMessage } from './translation.js';
+import { getMessage } from "./translation.js";
 
 inquirer.registerPrompt("date", DatePrompt);
 
-export default class Questions{
+export default class Questions {
   async selectContinent(continent, fromTo) {
-    if(continent.length === 0){
+    if (continent.length === 0) {
       throw new Error(await getMessage("noContinent"));
     }
     const message = {
@@ -22,11 +22,11 @@ export default class Questions{
         choices: continent,
       },
     ]);
-    return answers.continent
+    return answers.continent;
   }
 
   async selectCountry(countryNames, fromTo) {
-    if(countryNames.length === 0){
+    if (countryNames.length === 0) {
       throw new Error(await getMessage("noCountry"));
     }
     const message = {
@@ -45,7 +45,7 @@ export default class Questions{
   }
 
   async selectCity(cityNames, fromTo) {
-    if(cityNames.length === 0){
+    if (cityNames.length === 0) {
       throw new Error(await getMessage("noCity"));
     }
     const message = {
@@ -64,7 +64,7 @@ export default class Questions{
   }
 
   async selectAirport(airportNames) {
-    if(airportNames.length === 0){
+    if (airportNames.length === 0) {
       throw new Error(await getMessage("noAirport"));
     }
     const answers = await inquirer.prompt([
@@ -75,22 +75,21 @@ export default class Questions{
         choices: airportNames,
       },
     ]);
-    return answers.airport
+    return answers.airport;
   }
 
   async selectLanguage() {
     const languages = {
-      "Japanese": "jp",
+      Japanese: "jp",
       "English-US": "us",
-      "Chinese-TW": "tw"
-    }
+      "Chinese-TW": "tw",
+    };
 
     const locales = {
-      "jp": "ja-JP",
-      "us": "en-US",
-      "tw": "zh-TW"
-    }
-    
+      jp: "ja-JP",
+      us: "en-US",
+      tw: "zh-TW",
+    };
 
     const answer = await inquirer.prompt([
       {
@@ -129,8 +128,8 @@ export default class Questions{
     const currencies = {
       "Japanese Yen(JPY)": "JPY",
       "US dollar": "USD",
-      "Taiwan Dollar(TWD)": "TWD"
-    }
+      "Taiwan Dollar(TWD)": "TWD",
+    };
 
     const answer = await inquirer.prompt([
       {
@@ -177,14 +176,14 @@ export default class Questions{
         selectedDate.setUTCHours(0, 0, 0, 0);
         currentDate.setUTCHours(0, 0, 0, 0);
         if (selectedDate >= currentDate) {
-          return true;  // 有効な日付
+          return true; // 有効な日付
         } else {
-          return getMessage("invalidDate");  // 無効な日付のエラーメッセージ
+          return getMessage("invalidDate"); // 無効な日付のエラーメッセージ
         }
       },
       locale: locale,
       format: dateFormat,
     });
-    return timestamp
+    return timestamp;
   }
 }
