@@ -2,20 +2,20 @@
   "name": "cheapestrip",
   "version": "1.0.0",
   "description": "",
-  "main": "main.js",
+  "main": "cheapestrip.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hongfu22/trip_advisor.git"
+    "url": "git+https://github.com/hongfu22/cheapestrip.git"
   },
   "author": "hongfu",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/hongfu22/trip_advisor/issues"
+    "url": "https://github.com/hongfu22/cheapestrip/issues"
   },
-  "homepage": "https://github.com/hongfu22/trip_advisor#readme",
+  "homepage": "https://github.com/hongfu22/cheapestrip#readme",
   "type": "module",
   "parserOptions": {
     "sourceType": "module"
