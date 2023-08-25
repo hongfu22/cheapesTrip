@@ -2,7 +2,10 @@
   "name": "cheapestrip",
   "version": "1.0.0",
   "description": "",
-  "main": "cheapestrip.js",
+  "main": "bin/takeoff.js",
+  "bin": {
+    "cheapestrip": "bin/takeoff.js"
+  },
   "scripts": {
     "fix": "prettier --write . && eslint --fix .",
     "lint": "prettier --check . && eslint ."
@@ -18,14 +21,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hongfu22/cheapesTrip.git"
+    "url": "git+https://github.com/hongfu22/cheapestrip.git"
   },
   "author": "hongfu",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/hongfu22/cheapesTrip/issues"
+    "url": "https://github.com/hongfu22/cheapestrip/issues"
   },
-  "homepage": "https://github.com/hongfu22/cheapesTrip#readme",
+  "homepage": "https://github.com/hongfu22/cheapestrip#readme",
   "type": "module",
   "parserOptions": {
     "sourceType": "module"
