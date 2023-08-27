@@ -2,9 +2,9 @@
   "name": "cheapestrip",
   "version": "1.0.0",
   "description": "",
-  "main": "bin/takeoff.js",
+  "main": "bin/run.js",
   "bin": {
-    "cheapestrip": "bin/takeoff.js"
+    "cheapestrip": "bin/run.js"
   },
   "scripts": {
     "fix": "prettier --write . && eslint --fix .",
