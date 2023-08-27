@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-import { Trip } from "../lib/cheapestrip.js"
+import { Trip } from "../lib/cheapestrip.js";
 
-async function run(){
+async function run() {
   const trip = new Trip();
   await trip.initialize();
   const cheapestFlight = await trip.searchCheapestFlight(
