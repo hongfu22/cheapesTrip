@@ -2,7 +2,7 @@
 
 ## Install/インストール/下載
 
-npm i cheapestrip
+npm install -g cheapestrip
 
 ## 使い方
 
