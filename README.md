@@ -2,7 +2,13 @@
 
 ## Install/インストール/下載
 
-npm install -g cheapestrip
+`npm install -g cheapestrip`
+
+## APIキー
+`export API_KEY=YOUR_API_KEY`
+アプリを使うためには、APIキーを次の[サイト](https://www.partners.skyscanner.net/contact/travel-api)で取得し、
+上のYOUR_API_KEYの部分に差し替えてください。
+テスト用のAPIキーなどは次の[サイト](https://developers.skyscanner.net/docs/getting-started/authentication)を参考にしてください。
 
 ## 使い方
 
@@ -23,6 +29,12 @@ npm install -g cheapestrip
   ![旅程](/image/date_jp.gif)
 - 日程内の最安値のチケット代が分かります。（日程を選択しなかった場合はその時点で最安値のチケット代が分かります。）
 
+
+## API key
+`export API_KEY=YOUR_API_KEY`
+To use this app, you need to get API key [here](https://www.partners.skyscanner.net/contact/travel-api) and paste it in YOUR_API_KEY part.
+If you want test API, please reference [here](https://developers.skyscanner.net/docs/getting-started/authentication)
+
 ## Usage
 
 1. type this command
@@ -41,6 +53,12 @@ npm install -g cheapestrip
 - date fixed：choose what date(also month and year)
   ![itinerary](/image/date_en.gif)
 - You can get cheapest ticket price of flight（if you didn't choose month neither date, the package return cheapest price at the moment）
+
+## API密鑰
+`export API_KEY=YOUR_API_KEY`
+您要在以下網站拿下[API密鑰](https://www.partners.skyscanner.net/contact/travel-api)用這App
+拿下後貼到YOUR_API_KEY部分。
+如果您要測試API密鑰的話，去[這裡](https://developers.skyscanner.net/docs/getting-started/authentication)
 
 ## 怎麼用
 
